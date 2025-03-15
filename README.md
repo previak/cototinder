@@ -26,5 +26,5 @@
 
 ## Скачать
 
-APK актуальной версии - 
+APK актуальной версии - https://drive.google.com/file/d/1k_O1F1FKhHjv7-pkTRiwGjZ1lni4-HxV/view?usp=sharing
 
