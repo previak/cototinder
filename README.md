@@ -14,6 +14,10 @@
 8. На экране с подробной информацией находится увеличенное фото котика, его порода и подробная информация о ней
 
 ## Интерфейс
+### Иконка приложения
+<img width="349" alt="image" src="https://github.com/user-attachments/assets/35e6eda6-0fdc-4bff-8bdf-601fbce13133" />
+
+
 ### Главный экран
 <img width="352" alt="image" src="https://github.com/user-attachments/assets/5b483ce6-f125-4202-988f-5bba6cd34714" />
 
