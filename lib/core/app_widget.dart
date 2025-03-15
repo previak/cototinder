@@ -1,4 +1,4 @@
-import 'package:catotinder/presentation/screens/home_screen/home_screen.dart';
+import 'package:cototinder/presentation/screens/home_screen/home_screen.dart';
 import 'package:flutter/material.dart';
 
 class AppWidget extends StatelessWidget {

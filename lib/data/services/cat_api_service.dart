@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:catotinder/config/constants.dart';
-import 'package:catotinder/data/models/cat_breed.dart';
+import 'package:cototinder/config/constants.dart';
+import 'package:cototinder/data/models/cat_breed.dart';
 import 'package:http/http.dart' as http;
 
 class CatApiService {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:catotinder/data/models/cat_breed.dart';
-import 'package:catotinder/presentation/widgets/network_image.dart';
+import 'package:cototinder/data/models/cat_breed.dart';
+import 'package:cototinder/presentation/widgets/network_image.dart';
 
 class CatSwipeCard extends StatelessWidget {
   final CatBreed breed;
@@ -21,7 +21,7 @@ class CatSwipeCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               blurRadius: 10,
               spreadRadius: 2,
             ),
@@ -39,7 +39,7 @@ class CatSwipeCard extends StatelessWidget {
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      Colors.black.withOpacity(0.8),
+                      Colors.black.withValues(alpha: 0.8),
                       Colors.transparent,
                     ],
                   ),
@@ -53,10 +53,11 @@ class CatSwipeCard extends StatelessWidget {
                   children: [
                     Text(
                       breed.breedName,
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style:
+                          Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
                     ),
                     const SizedBox(height: 8),
                     Text(

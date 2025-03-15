@@ -1,11 +1,11 @@
-import 'package:catotinder/presentation/screens/home_screen/widgets/cat_swipe_card.dart';
+import 'package:cototinder/presentation/screens/home_screen/widgets/cat_swipe_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
-import 'package:catotinder/data/models/cat_breed.dart';
-import 'package:catotinder/data/services/cat_api_service.dart';
-import 'package:catotinder/presentation/screens/detail_screen/cat_detail_screen.dart';
-import 'package:catotinder/presentation/screens/home_screen/widgets/control_buttons.dart';
-import 'package:catotinder/presentation/screens/home_screen/widgets/likes_counter.dart';
+import 'package:cototinder/data/models/cat_breed.dart';
+import 'package:cototinder/data/services/cat_api_service.dart';
+import 'package:cototinder/presentation/screens/detail_screen/cat_detail_screen.dart';
+import 'package:cototinder/presentation/screens/home_screen/widgets/control_buttons.dart';
+import 'package:cototinder/presentation/screens/home_screen/widgets/likes_counter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

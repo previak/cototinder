@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:catotinder/data/models/cat_breed.dart';
-import 'package:catotinder/presentation/widgets/network_image.dart';
+import 'package:cototinder/data/models/cat_breed.dart';
+import 'package:cototinder/presentation/widgets/network_image.dart';
 
 class CatDetailScreen extends StatelessWidget {
   final CatBreed breed;
@@ -24,12 +24,12 @@ class CatDetailScreen extends StatelessWidget {
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: colorScheme.onBackground.withOpacity(0.6),
+              color: colorScheme.onSurface.withValues(alpha: 0.6),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.arrow_back,
-              color: colorScheme.background,
+              color: colorScheme.surface,
             ),
           ),
           onPressed: () => Navigator.pop(context),
@@ -61,7 +61,7 @@ class CatDetailScreen extends StatelessWidget {
                         end: Alignment.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          colorScheme.background.withOpacity(0.8),
+                          colorScheme.surface.withValues(alpha: 0.8),
                         ],
                       ),
                     ),
@@ -71,10 +71,10 @@ class CatDetailScreen extends StatelessWidget {
                   left: 24,
                   bottom: 24,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: colorScheme.onBackground.withOpacity(0.6),
+                      color: colorScheme.onSurface.withValues(alpha: 0.6),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -100,7 +100,7 @@ class CatDetailScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: colorScheme.onBackground,
+                      color: colorScheme.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -109,7 +109,7 @@ class CatDetailScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.5,
-                      color: colorScheme.onSurface.withOpacity(0.8),
+                      color: colorScheme.onSurface.withValues(alpha: 0.8),
                     ),
                     textAlign: TextAlign.justify,
                   ),

@@ -5,6 +5,7 @@ class ControlButtons extends StatelessWidget {
   final VoidCallback onLike;
 
   const ControlButtons({
+    super.key,
     required this.onDislike,
     required this.onLike,
   });
@@ -52,7 +53,7 @@ class ControlButtons extends StatelessWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: IconButton(

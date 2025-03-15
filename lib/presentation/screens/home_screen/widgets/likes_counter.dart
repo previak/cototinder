@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class LikesCounter extends StatelessWidget {
   final int likes;
 
-  const LikesCounter({
-    super.key,
-    required this.likes
-  });
+  const LikesCounter({super.key, required this.likes});
 
   @override
   Widget build(BuildContext context) {
