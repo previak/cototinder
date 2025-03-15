@@ -1,16 +1,25 @@
-# cototinder
+# Кототиндер (purrfect match)
 
-A new Flutter project.
+Кототиндер (purrfect match) - это приложение под Android и iOS для ознакомления с породами различных котиков в формате Тиндера
 
-## Getting Started
+## Функционал
 
-This project is a starting point for a Flutter application.
+1. На главном экране находятся карточки с котиками (порода + фото)
+2. Карточку можно свайпнуть вправо (поставить лайк)
+3. Карточку можно свайпнуть влево (попустить котика)
+4. Можно поставить лайк котику по кнопке снизу
+5. Можно пропустить котика по кнопке снизу
+6. Сверху на главном экране находится счетчик лайков
+7. При нажатии на карточку котика, открывается экран с подробной информацией о породе котика
+8. На экране с подробной информацией находится увеличенное фото котика, его порода и подробная информация о ней
 
-A few resources to get you started if this is your first Flutter project:
+## Интерфейс
+1. Главный экран
+   <img width="352" alt="image" src="https://github.com/user-attachments/assets/5b483ce6-f125-4202-988f-5bba6cd34714" />
+2. Экран с подробной информацией
+   <img width="351" alt="image" src="https://github.com/user-attachments/assets/d7f9aba3-0b5c-4cfa-b8fb-33792040bcfc" />
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Скачать
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+APK актуальной версии - 
+
