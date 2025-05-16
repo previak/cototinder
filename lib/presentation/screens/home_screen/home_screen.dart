@@ -1,11 +1,15 @@
-import 'package:cototinder/presentation/screens/home_screen/widgets/cat_swipe_card.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:cototinder/data/models/cat_breed.dart';
 import 'package:cototinder/data/services/cat_api_service.dart';
 import 'package:cototinder/presentation/screens/detail_screen/cat_detail_screen.dart';
 import 'package:cototinder/presentation/screens/home_screen/widgets/control_buttons.dart';
-import 'package:cototinder/presentation/screens/home_screen/widgets/likes_counter.dart';
+import 'package:cototinder/presentation/screens/home_screen/widgets/cat_swipe_card.dart';
+import 'package:cototinder/presentation/screens/liked_cats_screen/liked_cats_screen.dart';
+import 'package:cototinder/domain/cubits/liked_cats_cubit.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,54 +22,129 @@ class HomeScreenState extends State<HomeScreen> {
   final CatApiService _catService = CatApiService();
   final CardSwiperController _swiperController = CardSwiperController();
   late Future<List<CatBreed>> _futureBreeds;
-  final List<CatBreed> _breeds = [];
-  int _likesCounter = 0;
+  List<CatBreed> _breeds = [];
+  final int _currentCardIndex = 0;
+  bool _isLoadingMore = false;
 
   @override
   void initState() {
     super.initState();
+    _futureBreeds = Future.value([]);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _loadInitialBreeds();
   }
 
   Future<void> _loadInitialBreeds() async {
-    _futureBreeds = _catService.fetchRandomCatBreeds();
     try {
-      final breeds = await _futureBreeds;
+      setState(() {
+        _futureBreeds = _catService.fetchRandomCatBreeds();
+        _breeds = [];
+      });
+
+      final newBreeds = await _futureBreeds;
+
       if (mounted) {
-        setState(() => _breeds.addAll(breeds));
+        setState(() {
+          _breeds = newBreeds;
+          _swiperController.moveTo(0);
+        });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error loading initial breeds')),
-        );
-      }
+      _showErrorDialog(e);
     }
   }
 
   Future<void> _loadMoreBreeds() async {
+    if (_isLoadingMore || !mounted) return;
+    setState(() => _isLoadingMore = true);
+
     try {
       final newBreeds = await _catService.fetchRandomCatBreeds();
       if (mounted) {
-        setState(() => _breeds.addAll(newBreeds));
+        setState(() {
+          _breeds.addAll(newBreeds);
+          _isLoadingMore = false;
+        });
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error loading more breeds')),
-        );
-      }
+      _showErrorDialog(e);
+      if (mounted) setState(() => _isLoadingMore = false);
     }
   }
 
-  void _handleSwipe(CardSwiperDirection direction) {
-    if (direction == CardSwiperDirection.right && mounted) {
-      setState(() => _likesCounter++);
+  void _showErrorDialog(dynamic error) {
+    final context = this.context;
+    if (!mounted) return;
+
+    String message;
+    if (error is SocketException || error is HttpException) {
+      message = 'Проблемы с интернет-соединением\n'
+          'Проверьте подключение и попробуйте снова';
+    } else {
+      message = 'Ошибка: ${error.toString()}';
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ошибка'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+          if (error is SocketException || error is HttpException)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _loadInitialBreeds();
+              },
+              child: const Text('Повторить'),
+            ),
+        ],
+      ),
+    );
+  }
+
+  bool _handleSwipe(
+    int previousIndex,
+    int? currentIndex,
+    CardSwiperDirection direction,
+  ) {
+    if (currentIndex == null || previousIndex >= _breeds.length) return false;
+
+    if (previousIndex < 0 || previousIndex >= _breeds.length) return false;
+
+    if (direction == CardSwiperDirection.right) {
+      final likedCat = _breeds[previousIndex].copyWith(
+        likedDate: DateTime.now(),
+      );
+      context.read<LikedCatsCubit>().addLikedCat(likedCat);
+    }
+
+    if ((currentIndex) > _breeds.length - 5) {
+      _loadMoreBreeds();
+    }
+
+    return true;
+  }
+
+  void _handleLike() {
+    if (_currentCardIndex < _breeds.length) {
+      _swiperController.swipe(CardSwiperDirection.right);
     }
   }
 
-  void _handleLike() => _swiperController.swipe(CardSwiperDirection.right);
-  void _handleDislike() => _swiperController.swipe(CardSwiperDirection.left);
+  void _handleDislike() {
+    if (_currentCardIndex < _breeds.length) {
+      _swiperController.swipe(CardSwiperDirection.left);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +159,6 @@ class HomeScreenState extends State<HomeScreen> {
           ),
         ),
         centerTitle: true,
-        actions: [LikesCounter(likes: _likesCounter)],
       ),
       body: Column(
         children: [
@@ -91,38 +169,70 @@ class HomeScreenState extends State<HomeScreen> {
                 future: _futureBreeds,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.blue,
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.error, size: 48, color: Colors.red),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Failed to load cats',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _loadInitialBreeds,
+                            child: const Text('Retry'),
+                          ),
+                        ],
                       ),
                     );
                   }
-                  if (snapshot.hasError || _breeds.isEmpty) {
+
+                  if (_breeds.isEmpty) {
                     return Center(
                       child: Text(
-                        'Failed to load cats',
+                        'No cats available',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                     );
                   }
-                  return CardSwiper(
-                    controller: _swiperController,
-                    cardsCount: _breeds.length,
-                    onSwipe: (prevIndex, curIndex, direction) {
-                      _handleSwipe(direction);
-                      if (curIndex! > _breeds.length - 5) _loadMoreBreeds();
-                      return true;
-                    },
-                    cardBuilder: (context, index, _, __) => CatSwipeCard(
-                      breed: _breeds[index],
-                      onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              CatDetailScreen(breed: _breeds[index]),
+
+                  return Stack(
+                    children: [
+                      CardSwiper(
+                        controller: _swiperController,
+                        cardsCount: _breeds.length,
+                        onSwipe: _handleSwipe,
+                        numberOfCardsDisplayed: 3,
+                        backCardOffset: const Offset(0, 0),
+                        padding: EdgeInsets.zero,
+                        cardBuilder: (context, index, _, __) => CatSwipeCard(
+                          breed: _breeds[index],
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CatDetailScreen(
+                                breed: _breeds[index],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      if (_isLoadingMore)
+                        const Positioned(
+                          bottom: 20,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                    ],
                   );
                 },
               ),
@@ -132,6 +242,41 @@ class HomeScreenState extends State<HomeScreen> {
             onDislike: _handleDislike,
             onLike: _handleLike,
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                BlocBuilder<LikedCatsCubit, List<CatBreed>>(
+                  builder: (context, cats) => Text(
+                    '${cats.length}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                TextButton.icon(
+                  icon: const Icon(Icons.favorite, color: Colors.red),
+                  label: const Text(
+                    'Liked',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LikedCatsScreen(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
