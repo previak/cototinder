@@ -10,6 +10,7 @@ import 'package:cototinder/presentation/screens/home_screen/widgets/control_butt
 import 'package:cototinder/presentation/screens/home_screen/widgets/cat_swipe_card.dart';
 import 'package:cototinder/presentation/screens/liked_cats_screen/liked_cats_screen.dart';
 import 'package:cototinder/domain/cubits/liked_cats_cubit.dart';
+import 'package:cototinder/locator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,7 +20,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
-  final CatApiService _catService = CatApiService();
+  late final CatApiService _catService;
   final CardSwiperController _swiperController = CardSwiperController();
   late Future<List<CatBreed>> _futureBreeds;
   List<CatBreed> _breeds = [];
@@ -29,6 +30,7 @@ class HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    _catService = getIt<CatApiService>(); // Получаем сервис из локатора
     _futureBreeds = Future.value([]);
   }
 
@@ -41,8 +43,8 @@ class HomeScreenState extends State<HomeScreen> {
   Future<void> _loadInitialBreeds() async {
     try {
       setState(() {
+        _isLoadingMore = true;
         _futureBreeds = _catService.fetchRandomCatBreeds();
-        _breeds = [];
       });
 
       final newBreeds = await _futureBreeds;
@@ -51,10 +53,14 @@ class HomeScreenState extends State<HomeScreen> {
         setState(() {
           _breeds = newBreeds;
           _swiperController.moveTo(0);
+          _isLoadingMore = false;
         });
       }
     } catch (e) {
-      _showErrorDialog(e);
+      if (mounted) {
+        setState(() => _isLoadingMore = false);
+        _showErrorDialog(e);
+      }
     }
   }
 

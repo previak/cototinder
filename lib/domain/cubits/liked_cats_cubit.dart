@@ -1,11 +1,26 @@
+import 'package:cototinder/data/database.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cototinder/data/models/cat_breed.dart';
 
 class LikedCatsCubit extends Cubit<List<CatBreed>> {
-  LikedCatsCubit() : super([]);
+  final AppDatabase _database;
 
-  void addLikedCat(CatBreed cat) => emit([...state, cat]);
+  LikedCatsCubit(this._database) : super([]) {
+    _loadLikedCats();
+  }
 
-  void removeLikedCat(String id) =>
-      emit(state.where((c) => c.id != id).toList());
+  Future<void> _loadLikedCats() async {
+    final cats = await _database.getLikedCats();
+    emit(cats);
+  }
+
+  Future<void> addLikedCat(CatBreed cat) async {
+    await _database.addLikedCat(cat);
+    await _loadLikedCats();
+  }
+
+  Future<void> removeLikedCat(String id) async {
+    await _database.removeLikedCat(id);
+    await _loadLikedCats();
+  }
 }

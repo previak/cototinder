@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'locator.dart';
 
-void main() {
-  setupDependencies();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await setupDependencies();
   runApp(const AppWidget());
 }
